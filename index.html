@@ -18,8 +18,8 @@
         const { createClient } = supabase;
 
         // ⚠️ REPLACE THESE WITH YOUR ACTUAL SUPABASE VALUES ⚠️
-        const SUPABASE_URL = 'https://rbkqxpxagxsaicoxxcyk.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_Okh198rl-cQTcPlMkLabkw_zo4THZkE';
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE';
+        const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
         
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -229,7 +229,40 @@
                         </div>
 
                         <div className="bg-white border-2 border-black rounded-lg p-6">
-                            <h2 className="text-xl font-bold mb-4">{days[selectedDay]}'s Workout</h2>
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-xl font-bold">{days[selectedDay]}'s Workout</h2>
+                                {Object.keys(workouts).length === 0 && (
+                                    <button
+                                        onClick={async () => {
+                                            const defaultPlan = {
+                                                1: [{"id":"1","name":"Standing Calf Raises","sets":3,"reps":"10-15","completed":false,"notes":"On squat machine","tutorial":""},{"id":"2","name":"Leg Extension","sets":3,"reps":"10-15","completed":false,"notes":"2 warmup sets","tutorial":"https://youtube.com/shorts/d3d2yz7V26c"},{"id":"3","name":"Hack Squat","sets":3,"reps":"10-15","completed":false,"notes":"Heavy","tutorial":"https://youtu.be/rYgNArpwE7E"},{"id":"4","name":"Leg Press","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtube.com/shorts/nDh_BlnLCGc"},{"id":"5","name":"Leg Curl","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtube.com/shorts/FMCq0hT3KRU"}],
+                                                2: [{"id":"10","name":"Incline Smith Press","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtube.com/shorts/AtGwdlew4f0"},{"id":"11","name":"Cable Fly","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtube.com/shorts/z_yY1o8i6U0"},{"id":"12","name":"Preacher Curls","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtube.com/shorts/0y4tdUNPdlE"},{"id":"13","name":"Bicep Cable Curls","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtu.be/NFzTWp2qpiE"}],
+                                                3: [{"id":"20","name":"Lat Pulldown","sets":5,"reps":"4-8","completed":false,"notes":"Heavy","tutorial":"https://youtube.com/shorts/hnSqbBk15tw"},{"id":"21","name":"Seated Rows","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtube.com/shorts/FTwvmczf7bE"},{"id":"22","name":"Tricep Pushdown","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtu.be/_w-HpW70nSQ"},{"id":"23","name":"Tricep Dips","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtube.com/shorts/SLk3UUV8GuI"}],
+                                                4: [{"id":"30","name":"Leg Curl","sets":4,"reps":"10-15","completed":false,"notes":"1 warmup","tutorial":"https://youtube.com/shorts/FMCq0hT3KRU"},{"id":"31","name":"Wide Leg Press","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtube.com/shorts/BnacvXdaxq8"},{"id":"32","name":"RDL","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtube.com/shorts/5rIqP63yWFg"}],
+                                                5: [{"id":"40","name":"Overhead Press","sets":5,"reps":"10-15","completed":false,"notes":"2 warmup","tutorial":"https://youtube.com/shorts/k6tzKisR3NY"},{"id":"41","name":"Side Lateral Raises","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtu.be/Gmi_DCnJ93c"},{"id":"42","name":"Military Press","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtu.be/2yjwXTZQDDI"}]
+                                            };
+                                            
+                                            for (const [day, exercises] of Object.entries(defaultPlan)) {
+                                                await supabaseClient.from('workouts').insert({
+                                                    user_id: user.id,
+                                                    day_of_week: parseInt(day),
+                                                    exercises: exercises
+                                                });
+                                            }
+                                            
+                                            await supabaseClient.from('weekly_resets').insert({
+                                                user_id: user.id,
+                                                last_reset_date: new Date().toISOString().split('T')[0]
+                                            });
+                                            
+                                            await loadWorkouts(user.id);
+                                        }}
+                                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
+                                    >
+                                        ✨ Load My Workout Plan
+                                    </button>
+                                )}
+                            </div>
                             
                             {todayWorkout.length > 0 ? (
                                 <div className="space-y-3">
