@@ -9,6 +9,21 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        body { background: #f5f5f7; }
+        .card { background: white; border-radius: 20px; box-shadow: 0 2px 20px rgba(0,0,0,0.06); }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(102,126,234,0.4); }
+        .exercise-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .exercise-card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
+        .completed { background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); border: 2px solid #667eea; }
+        input:focus, textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+        .day-btn { transition: all 0.2s; }
+        .day-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; transform: scale(1.05); }
+        .stat-card { background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); }
+    </style>
 </head>
 <body>
     <div id="root"></div>
@@ -17,11 +32,84 @@
         const { useState, useEffect } = React;
         const { createClient } = supabase;
 
-        // ⚠️ REPLACE THESE WITH YOUR ACTUAL SUPABASE VALUES ⚠️
+        // ⚠️ REPLACE WITH YOUR SUPABASE VALUES
         const SUPABASE_URL = 'https://rbkqxpxagxsaicoxxcyk.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_Okh198rl-cQTcPlMkLabkw_zo4THZkE';
+        const SUPABASE_KEY = 'sb_publishable_0Kh198r1-cQIcP1MKLabkw_zo4THzk8';
         
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const workoutPlan = {
+            1: { // Monday
+                name: "Legs & Side Delts",
+                warmup: "Leg swings, Hip rotations, 90-90, Deep squat",
+                exercises: [
+                    { id: "m1", name: "Standing Calf Raises", sets: 3, reps: "10-15", notes: "On squat machine", tutorial: "" },
+                    { id: "m2", name: "Leg Extension", sets: 3, reps: "10-15", notes: "2 warmup sets - light", tutorial: "https://youtube.com/shorts/d3d2yz7V26c" },
+                    { id: "m3", name: "Hack Squat", sets: 3, reps: "10-15", notes: "Low foot placement, heavy", tutorial: "https://youtu.be/rYgNArpwE7E" },
+                    { id: "m4", name: "Lunges", sets: 3, reps: "10-15", notes: "", tutorial: "" },
+                    { id: "m5", name: "Leg Press", sets: 3, reps: "10-15", notes: "Close to failure", tutorial: "https://youtube.com/shorts/nDh_BlnLCGc" },
+                    { id: "m6", name: "Leg Extension", sets: 3, reps: "10-15", notes: "Failure drop set", tutorial: "https://youtube.com/shorts/d3d2yz7V26c" },
+                    { id: "m7", name: "Leg Curl", sets: 3, reps: "10-15", notes: "To failure", tutorial: "https://youtube.com/shorts/FMCq0hT3KRU" },
+                    { id: "m8", name: "Machine Side Lateral Raises", sets: 3, reps: "10-15", notes: "Failure set", tutorial: "https://youtu.be/Gmi_DCnJ93c" },
+                    { id: "m9", name: "Forearms", sets: 3, reps: "10-15", notes: "", tutorial: "" }
+                ]
+            },
+            2: { // Tuesday
+                name: "Chest & Biceps",
+                warmup: "Shoulder CARs, Shoulder rotations, Cat and cow, Scapula retraction/protraction",
+                exercises: [
+                    { id: "t1", name: "Vertical Machine Press", sets: 3, reps: "10-15", notes: "2 warmup sets - light", tutorial: "" },
+                    { id: "t2", name: "Incline Smith Press", sets: 3, reps: "10-15", notes: "", tutorial: "https://youtube.com/shorts/AtGwdlew4f0" },
+                    { id: "t3", name: "Cable Fly", sets: 3, reps: "10-15", notes: "", tutorial: "https://youtube.com/shorts/z_yY1o8i6U0" },
+                    { id: "t4", name: "Flat Dumbbell Press", sets: 3, reps: "10-15", notes: "", tutorial: "https://youtube.com/shorts/z6A4W5Dib28" },
+                    { id: "t5", name: "Push-ups", sets: 2, reps: "Max", notes: "", tutorial: "" },
+                    { id: "t6", name: "Preacher Curls", sets: 3, reps: "10-15", notes: "", tutorial: "https://youtube.com/shorts/0y4tdUNPdlE" },
+                    { id: "t7", name: "Bicep Cable Curls", sets: 3, reps: "10-15", notes: "", tutorial: "https://youtu.be/NFzTWp2qpiE" },
+                    { id: "t8", name: "Hammer Curls", sets: 3, reps: "10-15", notes: "", tutorial: "https://youtube.com/shorts/ZN-adB1-E7s" }
+                ]
+            },
+            3: { // Wednesday
+                name: "Back & Triceps",
+                warmup: "General warmup",
+                exercises: [
+                    { id: "w1", name: "Lat Pulldown", sets: 5, reps: "4-8", notes: "2 warmup + 3 heavy to failure", tutorial: "https://youtube.com/shorts/hnSqbBk15tw" },
+                    { id: "w2", name: "Seated Machine Rows", sets: 3, reps: "10-15", notes: "", tutorial: "https://youtube.com/shorts/FTwvmczf7bE" },
+                    { id: "w3", name: "Barbell Bent Over Rows", sets: 3, reps: "10-15", notes: "", tutorial: "https://youtube.com/shorts/Nqh7q3zDCoQ" },
+                    { id: "w4", name: "Hyperextensions", sets: 3, reps: "10-15", notes: "", tutorial: "https://youtu.be/qtjJUWCnDyE" },
+                    { id: "w5", name: "Tricep Pushdown", sets: 3, reps: "10-15", notes: "", tutorial: "https://youtu.be/_w-HpW70nSQ" },
+                    { id: "w6", name: "Overhead Dumbbell Extension", sets: 3, reps: "10-15", notes: "", tutorial: "https://youtube.com/shorts/8FNGBJUHfsA" },
+                    { id: "w7", name: "Tricep Dips", sets: 3, reps: "10-15", notes: "Level 1", tutorial: "https://youtube.com/shorts/SLk3UUV8GuI" },
+                    { id: "w8", name: "Shrugs on Smith", sets: 3, reps: "10-15", notes: "", tutorial: "https://youtube.com/shorts/zdBh_Ul2psI" },
+                    { id: "w9", name: "Forearms", sets: 3, reps: "10-15", notes: "", tutorial: "" }
+                ]
+            },
+            4: { // Thursday
+                name: "Legs",
+                warmup: "Leg swings, Hip rotations, 90-90, Deep squat",
+                exercises: [
+                    { id: "th1", name: "Standing Calf Raises", sets: 3, reps: "10-15", notes: "On squat machine", tutorial: "" },
+                    { id: "th2", name: "Leg Curl", sets: 4, reps: "10-15", notes: "1 warmup + 3 heavy", tutorial: "https://youtube.com/shorts/FMCq0hT3KRU" },
+                    { id: "th3", name: "Wide Leg Press", sets: 3, reps: "10-15", notes: "Heavy", tutorial: "https://youtube.com/shorts/BnacvXdaxq8" },
+                    { id: "th4", name: "RDL", sets: 3, reps: "10-15", notes: "", tutorial: "https://youtube.com/shorts/5rIqP63yWFg" },
+                    { id: "th5", name: "Goblet Squat", sets: 3, reps: "10-15", notes: "", tutorial: "https://youtu.be/3gpXflqRiEc" },
+                    { id: "th6", name: "Leg Extension", sets: 3, reps: "10-15", notes: "", tutorial: "https://youtube.com/shorts/d3d2yz7V26c" }
+                ]
+            },
+            5: { // Friday
+                name: "Shoulders & Chest",
+                warmup: "Shoulder CARs, Shoulder rotations, Cat and cow, Scapula retraction/protraction, Rotator cuff",
+                exercises: [
+                    { id: "f1", name: "Overhead Press", sets: 5, reps: "10-15", notes: "2 warmup on empty bar", tutorial: "https://youtube.com/shorts/k6tzKisR3NY" },
+                    { id: "f2", name: "Overhead Press Machine", sets: 3, reps: "10-15", notes: "Hammer grip, heavy to failure", tutorial: "" },
+                    { id: "f3", name: "Side Lateral Raises", sets: 3, reps: "10-15", notes: "", tutorial: "https://youtu.be/Gmi_DCnJ93c" },
+                    { id: "f4", name: "Military Press", sets: 3, reps: "10-15", notes: "", tutorial: "https://youtu.be/2yjwXTZQDDI" },
+                    { id: "f5", name: "Rear Delt Fly", sets: 3, reps: "10-15", notes: "", tutorial: "https://youtu.be/2_DPeXZ_Yv8" },
+                    { id: "f6", name: "Incline Machine Chest Press", sets: 3, reps: "10-15", notes: "", tutorial: "" },
+                    { id: "f7", name: "Decline Dumbbell Press", sets: 3, reps: "10-15", notes: "", tutorial: "" },
+                    { id: "f8", name: "Shrugs on Smith", sets: 3, reps: "10-15", notes: "", tutorial: "https://youtube.com/shorts/zdBh_Ul2psI" }
+                ]
+            }
+        };
 
         function WorkoutApp() {
             const [user, setUser] = useState(null);
@@ -32,19 +120,34 @@
             const [error, setError] = useState('');
             const [workouts, setWorkouts] = useState({});
             const [selectedDay, setSelectedDay] = useState(new Date().getDay());
+            const [activeTab, setActiveTab] = useState('workout');
+            const [showLogForm, setShowLogForm] = useState(null);
+            const [logData, setLogData] = useState({ weight: '', reps: '' });
+            const [exerciseLogs, setExerciseLogs] = useState([]);
+            const [bodyWeights, setBodyWeights] = useState([]);
+            const [showWeightForm, setShowWeightForm] = useState(false);
+            const [newBodyWeight, setNewBodyWeight] = useState('');
             
             const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
             useEffect(() => {
                 supabaseClient.auth.getSession().then(({ data: { session } }) => {
                     setUser(session?.user || null);
-                    if (session?.user) loadWorkouts(session.user.id);
+                    if (session?.user) {
+                        loadWorkouts(session.user.id);
+                        loadExerciseLogs(session.user.id);
+                        loadBodyWeights(session.user.id);
+                    }
                     setLoading(false);
                 });
 
                 const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((_, session) => {
                     setUser(session?.user || null);
-                    if (session?.user) loadWorkouts(session.user.id);
+                    if (session?.user) {
+                        loadWorkouts(session.user.id);
+                        loadExerciseLogs(session.user.id);
+                        loadBodyWeights(session.user.id);
+                    }
                 });
 
                 return () => subscription.unsubscribe();
@@ -65,6 +168,26 @@
                 }
             };
 
+            const loadExerciseLogs = async (userId) => {
+                const { data } = await supabaseClient
+                    .from('exercise_logs')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .order('logged_at', { ascending: false });
+                
+                if (data) setExerciseLogs(data);
+            };
+
+            const loadBodyWeights = async (userId) => {
+                const { data } = await supabaseClient
+                    .from('body_measurements')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .order('measured_at', { ascending: false });
+                
+                if (data) setBodyWeights(data);
+            };
+
             const handleAuth = async (e) => {
                 e.preventDefault();
                 setError('');
@@ -73,7 +196,7 @@
                     if (isSignUp) {
                         const { error } = await supabaseClient.auth.signUp({ email, password });
                         if (error) throw error;
-                        alert('Check your email to confirm your account!');
+                        alert('Account created! You can now log in.');
                     } else {
                         const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
                         if (error) throw error;
@@ -86,6 +209,20 @@
             const handleLogout = async () => {
                 await supabaseClient.auth.signOut();
                 setWorkouts({});
+                setExerciseLogs([]);
+                setBodyWeights([]);
+            };
+
+            const initializeWorkouts = async () => {
+                for (const [day, plan] of Object.entries(workoutPlan)) {
+                    const exercises = plan.exercises.map(ex => ({ ...ex, completed: false }));
+                    await supabaseClient.from('workouts').insert({
+                        user_id: user.id,
+                        day_of_week: parseInt(day),
+                        exercises: exercises
+                    });
+                }
+                await loadWorkouts(user.id);
             };
 
             const toggleExercise = async (dayIndex, exerciseId) => {
@@ -112,31 +249,75 @@
                 }
             };
 
+            const logExercise = async (exerciseId, exerciseName) => {
+                if (!logData.weight || !logData.reps) return;
+                
+                await supabaseClient.from('exercise_logs').insert({
+                    user_id: user.id,
+                    exercise_id: exerciseId,
+                    exercise_name: exerciseName,
+                    weight: parseFloat(logData.weight),
+                    reps: parseInt(logData.reps)
+                });
+                
+                await loadExerciseLogs(user.id);
+                setShowLogForm(null);
+                setLogData({ weight: '', reps: '' });
+            };
+
+            const logBodyWeight = async () => {
+                if (!newBodyWeight) return;
+                
+                await supabaseClient.from('body_measurements').insert({
+                    user_id: user.id,
+                    weight: parseFloat(newBodyWeight),
+                    waist: 0,
+                    left_arm: 0,
+                    right_arm: 0
+                });
+                
+                await loadBodyWeights(user.id);
+                setShowWeightForm(false);
+                setNewBodyWeight('');
+            };
+
+            const getExerciseHistory = (exerciseId) => {
+                return exerciseLogs.filter(log => log.exercise_id === exerciseId).slice(0, 5);
+            };
+
+            const getPersonalRecord = (exerciseId) => {
+                const logs = exerciseLogs.filter(log => log.exercise_id === exerciseId);
+                if (logs.length === 0) return null;
+                return logs.reduce((max, log) => log.weight > max.weight ? log : max);
+            };
+
             if (loading) {
                 return (
-                    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-                        <div className="text-xl">Loading...</div>
+                    <div className="min-h-screen flex items-center justify-center">
+                        <div className="text-xl font-medium text-gray-600">Loading...</div>
                     </div>
                 );
             }
 
             if (!user) {
                 return (
-                    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black flex items-center justify-center p-4">
-                        <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-md">
-                            <h1 className="text-3xl font-bold text-center mb-2">💪 Workout Tracker</h1>
-                            <p className="text-gray-600 text-center mb-8">Track your progress, reach your goals</p>
+                    <div className="min-h-screen flex items-center justify-center p-4">
+                        <div className="card p-8 w-full max-w-md">
+                            <div className="text-center mb-8">
+                                <h1 className="text-4xl font-bold mb-2" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>Workout Tracker</h1>
+                                <p className="text-gray-500">Your personal fitness companion</p>
+                            </div>
 
-                            <div className="flex gap-2 mb-6">
+                            <div className="flex gap-2 mb-6 p-1 bg-gray-100 rounded-xl">
                                 <button
                                     onClick={() => setIsSignUp(false)}
-                                    className={`flex-1 py-2 rounded-lg font-medium ${!isSignUp ? 'bg-black text-white' : 'bg-gray-200'}`}
+                                    className={`flex-1 py-2.5 rounded-lg font-medium transition-all ${!isSignUp ? 'bg-white shadow-sm' : ''}`}
                                 >
                                     Login
                                 </button>
                                 <button
                                     onClick={() => setIsSignUp(true)}
-                                    className={`flex-1 py-2 rounded-lg font-medium ${isSignUp ? 'bg-black text-white' : 'bg-gray-200'}`}
+                                    className={`flex-1 py-2.5 rounded-lg font-medium transition-all ${isSignUp ? 'bg-white shadow-sm' : ''}`}
                                 >
                                     Sign Up
                                 </button>
@@ -144,41 +325,39 @@
 
                             <form onSubmit={handleAuth} className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium mb-1">Email</label>
                                     <input
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         required
-                                        className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-black focus:outline-none"
-                                        placeholder="you@example.com"
+                                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl transition-all"
+                                        placeholder="Email"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium mb-1">Password</label>
                                     <input
                                         type="password"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
                                         minLength={6}
-                                        className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-black focus:outline-none"
-                                        placeholder="••••••••"
+                                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl transition-all"
+                                        placeholder="Password"
                                     />
                                 </div>
 
                                 {error && (
-                                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+                                    <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
                                         {error}
                                     </div>
                                 )}
 
                                 <button
                                     type="submit"
-                                    className="w-full py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800"
+                                    className="w-full py-3 btn-primary text-white rounded-xl font-semibold transition-all"
                                 >
-                                    {isSignUp ? 'Sign Up' : 'Login'}
+                                    {isSignUp ? 'Create Account' : 'Sign In'}
                                 </button>
                             </form>
                         </div>
@@ -187,123 +366,336 @@
             }
 
             const todayWorkout = workouts[selectedDay] || [];
+            const todayPlan = workoutPlan[selectedDay];
             const progress = todayWorkout.length > 0 
                 ? Math.round((todayWorkout.filter(ex => ex.completed).length / todayWorkout.length) * 100)
                 : 0;
 
             return (
-                <div className="min-h-screen bg-white p-4">
-                    <div className="max-w-4xl mx-auto">
-                        <div className="bg-black text-white rounded-lg shadow-lg p-6 mb-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <h1 className="text-3xl font-bold">💪 Workout Tracker</h1>
+                <div className="min-h-screen p-4 pb-20">
+                    <div className="max-w-6xl mx-auto">
+                        {/* Header */}
+                        <div className="card p-6 mb-6">
+                            <div className="flex items-center justify-between mb-6">
+                                <div>
+                                    <h1 className="text-3xl font-bold mb-1">Workout Tracker</h1>
+                                    <p className="text-gray-500">Stay consistent, see results</p>
+                                </div>
                                 <div className="flex items-center gap-4">
                                     <div className="text-right">
-                                        <div className="text-sm text-gray-300">Progress</div>
-                                        <div className="text-2xl font-bold text-green-400">{progress}%</div>
+                                        <div className="text-sm text-gray-500">Today's Progress</div>
+                                        <div className="text-3xl font-bold" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>{progress}%</div>
                                     </div>
                                     <button
                                         onClick={handleLogout}
-                                        className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm"
+                                        className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-medium transition-all"
                                     >
                                         Logout
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="flex gap-2 overflow-x-auto">
-                                {days.map((day, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => setSelectedDay(index)}
-                                        className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap ${
-                                            selectedDay === index
-                                                ? 'bg-white text-black'
-                                                : 'bg-gray-800 hover:bg-gray-700'
-                                        }`}
-                                    >
-                                        {day}
-                                    </button>
-                                ))}
+                            {/* Tabs */}
+                            <div className="flex gap-2 p-1 bg-gray-100 rounded-xl">
+                                <button
+                                    onClick={() => setActiveTab('workout')}
+                                    className={`flex-1 py-2.5 rounded-lg font-medium transition-all ${activeTab === 'workout' ? 'bg-white shadow-sm' : ''}`}
+                                >
+                                    💪 Workout
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('progress')}
+                                    className={`flex-1 py-2.5 rounded-lg font-medium transition-all ${activeTab === 'progress' ? 'bg-white shadow-sm' : ''}`}
+                                >
+                                    📊 Progress
+                                </button>
                             </div>
                         </div>
 
-                        <div className="bg-white border-2 border-black rounded-lg p-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-xl font-bold">{days[selectedDay]}'s Workout</h2>
-                                {Object.keys(workouts).length === 0 && (
-                                    <button
-                                        onClick={async () => {
-                                            const defaultPlan = {
-                                                1: [{"id":"1","name":"Standing Calf Raises","sets":3,"reps":"10-15","completed":false,"notes":"On squat machine","tutorial":""},{"id":"2","name":"Leg Extension","sets":3,"reps":"10-15","completed":false,"notes":"2 warmup sets","tutorial":"https://youtube.com/shorts/d3d2yz7V26c"},{"id":"3","name":"Hack Squat","sets":3,"reps":"10-15","completed":false,"notes":"Heavy","tutorial":"https://youtu.be/rYgNArpwE7E"},{"id":"4","name":"Leg Press","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtube.com/shorts/nDh_BlnLCGc"},{"id":"5","name":"Leg Curl","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtube.com/shorts/FMCq0hT3KRU"}],
-                                                2: [{"id":"10","name":"Incline Smith Press","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtube.com/shorts/AtGwdlew4f0"},{"id":"11","name":"Cable Fly","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtube.com/shorts/z_yY1o8i6U0"},{"id":"12","name":"Preacher Curls","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtube.com/shorts/0y4tdUNPdlE"},{"id":"13","name":"Bicep Cable Curls","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtu.be/NFzTWp2qpiE"}],
-                                                3: [{"id":"20","name":"Lat Pulldown","sets":5,"reps":"4-8","completed":false,"notes":"Heavy","tutorial":"https://youtube.com/shorts/hnSqbBk15tw"},{"id":"21","name":"Seated Rows","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtube.com/shorts/FTwvmczf7bE"},{"id":"22","name":"Tricep Pushdown","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtu.be/_w-HpW70nSQ"},{"id":"23","name":"Tricep Dips","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtube.com/shorts/SLk3UUV8GuI"}],
-                                                4: [{"id":"30","name":"Leg Curl","sets":4,"reps":"10-15","completed":false,"notes":"1 warmup","tutorial":"https://youtube.com/shorts/FMCq0hT3KRU"},{"id":"31","name":"Wide Leg Press","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtube.com/shorts/BnacvXdaxq8"},{"id":"32","name":"RDL","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtube.com/shorts/5rIqP63yWFg"}],
-                                                5: [{"id":"40","name":"Overhead Press","sets":5,"reps":"10-15","completed":false,"notes":"2 warmup","tutorial":"https://youtube.com/shorts/k6tzKisR3NY"},{"id":"41","name":"Side Lateral Raises","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtu.be/Gmi_DCnJ93c"},{"id":"42","name":"Military Press","sets":3,"reps":"10-15","completed":false,"tutorial":"https://youtu.be/2yjwXTZQDDI"}]
-                                            };
-                                            
-                                            for (const [day, exercises] of Object.entries(defaultPlan)) {
-                                                await supabaseClient.from('workouts').insert({
-                                                    user_id: user.id,
-                                                    day_of_week: parseInt(day),
-                                                    exercises: exercises
-                                                });
-                                            }
-                                            
-                                            await supabaseClient.from('weekly_resets').insert({
-                                                user_id: user.id,
-                                                last_reset_date: new Date().toISOString().split('T')[0]
-                                            });
-                                            
-                                            await loadWorkouts(user.id);
-                                        }}
-                                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
-                                    >
-                                        ✨ Load My Workout Plan
-                                    </button>
-                                )}
-                            </div>
-                            
-                            {todayWorkout.length > 0 ? (
-                                <div className="space-y-3">
-                                    {todayWorkout.map((exercise) => (
-                                        <div
-                                            key={exercise.id}
-                                            className={`p-4 rounded-lg border-2 ${
-                                                exercise.completed
-                                                    ? 'bg-green-50 border-green-400'
-                                                    : 'border-black'
-                                            }`}
+                        {activeTab === 'workout' ? (
+                            <>
+                                {/* Day Selector */}
+                                <div className="card p-4 mb-6">
+                                    <div className="flex gap-2 overflow-x-auto pb-2">
+                                        {days.map((day, index) => (
+                                            <button
+                                                key={index}
+                                                onClick={() => setSelectedDay(index)}
+                                                className={`day-btn px-6 py-3 rounded-xl font-medium whitespace-nowrap ${
+                                                    selectedDay === index ? 'active text-white' : 'bg-gray-100 hover:bg-gray-200'
+                                                }`}
+                                            >
+                                                {day}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Workout Content */}
+                                {Object.keys(workouts).length === 0 ? (
+                                    <div className="card p-12 text-center">
+                                        <div className="text-6xl mb-4">💪</div>
+                                        <h2 className="text-2xl font-bold mb-4">Ready to Start?</h2>
+                                        <p className="text-gray-500 mb-6">Load your personalized 5-day workout plan</p>
+                                        <button
+                                            onClick={initializeWorkouts}
+                                            className="px-8 py-3 btn-primary text-white rounded-xl font-semibold transition-all inline-block"
                                         >
-                                            <div className="flex items-center gap-3">
-                                                <button
-                                                    onClick={() => toggleExercise(selectedDay, exercise.id)}
-                                                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                                                        exercise.completed
-                                                            ? 'bg-green-500 border-green-500'
-                                                            : 'border-black'
-                                                    }`}
-                                                >
-                                                    {exercise.completed && <span className="text-white">✓</span>}
-                                                </button>
-                                                <div className="flex-1">
-                                                    <h3 className={`font-semibold text-lg ${exercise.completed ? 'line-through text-gray-500' : ''}`}>
-                                                        {exercise.name}
-                                                    </h3>
-                                                    <div className="text-sm text-gray-600">
-                                                        {exercise.sets} sets × {exercise.reps} reps
-                                                    </div>
-                                                </div>
+                                            ✨ Load Workout Plan
+                                        </button>
+                                    </div>
+                                ) : todayPlan ? (
+                                    <div className="space-y-6">
+                                        {/* Workout Info */}
+                                        <div className="card p-6">
+                                            <h2 className="text-2xl font-bold mb-2">{todayPlan.name}</h2>
+                                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                <span>🔥</span>
+                                                <span className="font-medium">Warmup:</span>
+                                                <span>{todayPlan.warmup}</span>
                                             </div>
                                         </div>
-                                    ))}
+
+                                        {/* Exercises */}
+                                        <div className="space-y-3">
+                                            {todayWorkout.map((exercise, idx) => {
+                                                const history = getExerciseHistory(exercise.id);
+                                                const pr = getPersonalRecord(exercise.id);
+                                                
+                                                return (
+                                                    <div
+                                                        key={exercise.id}
+                                                        className={`exercise-card card p-5 ${exercise.completed ? 'completed' : ''}`}
+                                                    >
+                                                        <div className="flex items-start gap-4">
+                                                            <button
+                                                                onClick={() => toggleExercise(selectedDay, exercise.id)}
+                                                                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mt-1 transition-all ${
+                                                                    exercise.completed ? 'bg-gradient-to-br from-purple-500 to-purple-600 border-purple-500' : 'border-gray-300 hover:border-purple-500'
+                                                                }`}
+                                                            >
+                                                                {exercise.completed && <span className="text-white text-sm">✓</span>}
+                                                            </button>
+                                                            
+                                                            <div className="flex-1">
+                                                                <div className="flex items-start justify-between mb-2">
+                                                                    <div>
+                                                                        <h3 className={`font-semibold text-lg ${exercise.completed ? 'text-gray-400 line-through' : ''}`}>
+                                                                            {idx + 1}. {exercise.name}
+                                                                        </h3>
+                                                                        <div className="text-sm text-gray-600 mt-1">
+                                                                            {exercise.sets} sets × {exercise.reps} reps
+                                                                            {exercise.notes && <span className="ml-2">• {exercise.notes}</span>}
+                                                                        </div>
+                                                                    </div>
+                                                                    {pr && (
+                                                                        <div className="stat-card px-3 py-1 rounded-lg text-sm">
+                                                                            <span className="font-semibold">{pr.weight}kg</span>
+                                                                            <span className="text-xs text-gray-600 ml-1">PR</span>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+
+                                                                {history.length > 0 && (
+                                                                    <div className="flex gap-2 mb-3 overflow-x-auto">
+                                                                        {history.map((log, i) => (
+                                                                            <div key={i} className="bg-gray-50 px-3 py-1.5 rounded-lg text-xs whitespace-nowrap">
+                                                                                {log.weight}kg × {log.reps}
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                )}
+
+                                                                <div className="flex gap-3">
+                                                                    {exercise.tutorial && (
+                                                                        <a
+                                                                            href={exercise.tutorial}
+                                                                            target="_blank"
+                                                                            className="text-sm font-medium text-purple-600 hover:text-purple-700"
+                                                                        >
+                                                                            📺 Tutorial
+                                                                        </a>
+                                                                    )}
+                                                                    <button
+                                                                        onClick={() => setShowLogForm(exercise.id)}
+                                                                        className="text-sm font-medium text-purple-600 hover:text-purple-700"
+                                                                    >
+                                                                        📝 Log Set
+                                                                    </button>
+                                                                </div>
+
+                                                                {showLogForm === exercise.id && (
+                                                                    <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+                                                                        <div className="flex gap-3 items-end">
+                                                                            <div className="flex-1">
+                                                                                <label className="text-xs font-medium text-gray-600 mb-1 block">Weight (kg)</label>
+                                                                                <input
+                                                                                    type="number"
+                                                                                    step="0.5"
+                                                                                    value={logData.weight}
+                                                                                    onChange={(e) => setLogData({ ...logData, weight: e.target.value })}
+                                                                                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg"
+                                                                                    placeholder="20"
+                                                                                />
+                                                                            </div>
+                                                                            <div className="flex-1">
+                                                                                <label className="text-xs font-medium text-gray-600 mb-1 block">Reps</label>
+                                                                                <input
+                                                                                    type="number"
+                                                                                    value={logData.reps}
+                                                                                    onChange={(e) => setLogData({ ...logData, reps: e.target.value })}
+                                                                                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg"
+                                                                                    placeholder="12"
+                                                                                />
+                                                                            </div>
+                                                                            <button
+                                                                                onClick={() => logExercise(exercise.id, exercise.name)}
+                                                                                className="px-6 py-2 btn-primary text-white rounded-lg font-medium"
+                                                                            >
+                                                                                Save
+                                                                            </button>
+                                                                            <button
+                                                                                onClick={() => {
+                                                                                    setShowLogForm(null);
+                                                                                    setLogData({ weight: '', reps: '' });
+                                                                                }}
+                                                                                className="px-4 py-2 bg-gray-200 rounded-lg font-medium"
+                                                                            >
+                                                                                Cancel
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="card p-12 text-center">
+                                        <div className="text-6xl mb-4">😴</div>
+                                        <h2 className="text-2xl font-bold mb-2">Rest Day</h2>
+                                        <p className="text-gray-500">Recovery is just as important as training!</p>
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <div className="space-y-6">
+                                {/* Body Weight Tracking */}
+                                <div className="card p-6">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <h2 className="text-xl font-bold">Body Weight</h2>
+                                        <button
+                                            onClick={() => setShowWeightForm(!showWeightForm)}
+                                            className="px-4 py-2 btn-primary text-white rounded-xl font-medium text-sm"
+                                        >
+                                            + Add Weight
+                                        </button>
+                                    </div>
+
+                                    {showWeightForm && (
+                                        <div className="mb-6 p-4 bg-gray-50 rounded-xl">
+                                            <div className="flex gap-3">
+                                                <input
+                                                    type="number"
+                                                    step="0.1"
+                                                    value={newBodyWeight}
+                                                    onChange={(e) => setNewBodyWeight(e.target.value)}
+                                                    className="flex-1 px-4 py-2 border-2 border-gray-200 rounded-lg"
+                                                    placeholder="Weight (kg)"
+                                                />
+                                                <button
+                                                    onClick={logBodyWeight}
+                                                    className="px-6 py-2 btn-primary text-white rounded-lg font-medium"
+                                                >
+                                                    Save
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        setShowWeightForm(false);
+                                                        setNewBodyWeight('');
+                                                    }}
+                                                    className="px-4 py-2 bg-gray-200 rounded-lg font-medium"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {bodyWeights.length > 0 ? (
+                                        <div className="space-y-2">
+                                            {bodyWeights.map((record, idx) => (
+                                                <div key={idx} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                                    <span className="font-medium">{new Date(record.measured_at).toLocaleDateString()}</span>
+                                                    <span className="text-2xl font-bold" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
+                                                        {record.weight} kg
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-center text-gray-500 py-8">No weight records yet</p>
+                                    )}
                                 </div>
-                            ) : (
-                                <div className="text-center py-12 text-gray-500">
-                                    <p>Rest day! 😴</p>
+
+                                {/* Exercise History */}
+                                <div className="card p-6">
+                                    <h2 className="text-xl font-bold mb-6">Exercise History</h2>
+                                    {exerciseLogs.length > 0 ? (
+                                        <div className="space-y-4">
+                                            {Object.entries(
+                                                exerciseLogs.reduce((acc, log) => {
+                                                    if (!acc[log.exercise_name]) acc[log.exercise_name] = [];
+                                                    acc[log.exercise_name].push(log);
+                                                    return acc;
+                                                }, {})
+                                            ).map(([name, logs]) => (
+                                                <div key={name} className="p-4 bg-gray-50 rounded-xl">
+                                                    <h3 className="font-semibold mb-3">{name}</h3>
+                                                    <div className="space-y-2">
+                                                        {logs.slice(0, 5).map((log, idx) => (
+                                                            <div key={idx} className="flex justify-between text-sm">
+                                                                <span className="text-gray-600">{new Date(log.logged_at).toLocaleDateString()}</span>
+                                                                <span className="font-medium">{log.weight}kg × {log.reps} reps</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-center text-gray-500 py-8">No exercise logs yet. Start logging your sets!</p>
+                                    )}
                                 </div>
-                            )}
-                        </div>
+
+                                {/* Personal Records */}
+                                <div className="card p-6">
+                                    <h2 className="text-xl font-bold mb-6">Personal Records</h2>
+                                    {exerciseLogs.length > 0 ? (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {Object.entries(
+                                                exerciseLogs.reduce((acc, log) => {
+                                                    if (!acc[log.exercise_name] || log.weight > acc[log.exercise_name].weight) {
+                                                        acc[log.exercise_name] = log;
+                                                    }
+                                                    return acc;
+                                                }, {})
+                                            ).map(([name, log]) => (
+                                                <div key={name} className="stat-card p-4 rounded-xl">
+                                                    <div className="text-sm text-gray-600 mb-1">{name}</div>
+                                                    <div className="text-2xl font-bold">{log.weight}kg × {log.reps}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-center text-gray-500 py-8">No PRs yet. Keep pushing!</p>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             );
